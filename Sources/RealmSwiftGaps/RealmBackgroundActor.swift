@@ -25,6 +25,13 @@ public actor RealmBackgroundActor {
         if preWarmIfNeeded, let preWarmCacheCallback = Self.preWarmCacheCallback {
             try? await preWarmCacheCallback(self)
             Self.preWarmCacheCallback = nil
+        } else {
+            do {
+                let realm = try await Realm(configuration: configuration, actor: self)
+                setCachedRealm(realm, for: configuration)
+            } catch {
+                debugPrint("==== \(error)")
+            }
         }
         return cachedRealms[key]
     }
